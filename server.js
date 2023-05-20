@@ -2,13 +2,15 @@ import { ApolloServer, gql } from "apollo-server";
 
 const typeDef = gql`
     type Query {
-        type Author {
+        type User {
+            id: ID,
             name: String,
             articles: [Article],
             comments: [Comment]
         }
         type Article {
-            author: Author,                                       
+            id: ID,
+            author: User,
             publish-date: String,
             modify-date: String,
             title: String,
@@ -16,7 +18,8 @@ const typeDef = gql`
             comments: [Comment]
         }
         type Comment {
-            author: Author,
+            id: ID,
+            author: User,
             article: Article,
             content: String
         }
