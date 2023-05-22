@@ -25,8 +25,7 @@ const typeDef = gql`
         }
     }
 `;
-
-const server = new ApolloServer({});
+const server = new ApolloServer({ typeDef });
 server.listen().then(({url})=>{
-    console.log(`Running on the ${url}`);
+    console.log(`Running on ${url}`);
 });
