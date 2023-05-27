@@ -6,3 +6,29 @@ datasource db {
 generator client {
     provider = "prisma-client-js"
 }
+
+model users {
+    id       Int    @id @default(autoincrement())
+    name     String
+    nickname String
+    school   String
+}
+
+model comments {
+    id            Int      @id @default(autoincrement())
+    authorId      Int
+    articleId     Int
+    type          Boolean
+    publishedDate DateTime
+    modifiedDate  DateTime
+    content       String
+}
+
+model articles {
+    id            Int      @id @default(autoincrement())
+    authorId      Int
+    type          Boolean
+    publishedDate DateTime
+    modifiedDate  DateTime
+    content       String
+}
