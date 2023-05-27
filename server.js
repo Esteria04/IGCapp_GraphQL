@@ -25,10 +25,10 @@ const typeDefs = gql`
   type Query {
     users: [User]
     articles: [Article]
+    comments: [Comment]
   }
 `;
 const server = new ApolloServer({ typeDefs });
 server.listen().then(({ url }) => {
   console.log(`Running on ${url}`);
 });
-   
