@@ -7,28 +7,68 @@ generator client {
     provider = "prisma-client-js"
 }
 
-model users {
-    id       Int    @id @default(autoincrement())
+model User {
+    id       Int       @id @default(autoincrement())
     name     String
     nickname String
     school   String
+    profile  Profile?
+    article  Article[]
+    comment  Comment[]
 }
 
-model comments {
+model Profile {
+    id     Int
+    userId Int  @unique
+    User   User @relation(fields: [userId], references: [id])
+}
+
+model Comment {
     id            Int      @id @default(autoincrement())
-    authorId      Int
-    articleId     Int
+    authorId      Int      @unique
+    author        User     @relation(fields: [authorId], references: [id])
+    articleId     Int      @unique
+    article       Article  @relation(fields: [articleId], references: [id])
     type          Boolean
     publishedDate DateTime
     modifiedDate  DateTime
     content       String
 }
 
-model articles {
+model Article {
     id            Int      @id @default(autoincrement())
-    authorId      Int
+    authorId      Int      @unique
+    author        User     @relation(fields: [authorId], references: [id])
     type          Boolean
     publishedDate DateTime
     modifiedDate  DateTime
     content       String
+    comment       Comment[]
 }
+
+// Profile, Post가 있어도 되고, 없어도 된다.
+// model User {
+//     id       Int      @id @default(autoincrement())
+//     username String
+//     Profile  Profile?
+//     Post     Post[]
+// }
+// // Profile는 1유저당 1개만 있어야 한다 ( 일대일 대응 )
+// // Post는 1유저에 여러개를 가질 수 있다 ( 일대다 대응 )
+
+// // User가 무조건 있어야 한다.
+// model Profile {
+//     id     Int     @id @default(autoincrement())
+//     bio    String?
+//     userId Int     @unique
+//     User   User    @relation(fields: [userId], references: [id])
+// }
+
+// // User가 무조건 있어야 한다.
+// model Post {
+//     id     Int    @id @default(autoincrement())
+//     title  String
+//     photo  String
+//     userId Int    @unique
+//     User   User   @relation(fields: [userId], references: [id])
+// }
