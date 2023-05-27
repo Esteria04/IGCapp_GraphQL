@@ -35,13 +35,23 @@ const typeDefs = gql`
     users: [User!]!
     articles: [Article!]!
     comments: [Comment!]!
-    user(id: ID): User!
+    user(id: ID): User
     article(id: ID): Article
     comment(id: ID): Comment
   }
-  
+
   type Mutation {
-    postArticle()
+    postArticle(authorId: ID!, type: Boolean!, title: String!, content: String!): Article!
+    modifyArticle(authorId: ID!, type: Boolean, title: String, content: String, articleId: ID!): Article!
+    deleteArticle(authorId: ID!, articleId: ID!): Boolean!
+
+    postComment(authorId: ID!, type: Boolean!, content: String!): Comment!
+    modifyComment(authorId: ID!, type: Boolean, content: String, commentId: ID!): Comment!
+    deleteComment(authorId: ID!, commentId: ID!): Boolean!
+
+    createUser(name: String!, school: String!): User!
+    modifyUser(userId: ID!, name:String, school:String): User!
+    deleteUser(userID: ID!)
   }
 `;
 
