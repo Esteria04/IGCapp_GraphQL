@@ -26,6 +26,7 @@ const typeDefs = gql`
     users: [User]
     articles: [Article]
     comments: [Comment]
+    user(id: ID): User
   }
 `;
 const server = new ApolloServer({ typeDefs });
