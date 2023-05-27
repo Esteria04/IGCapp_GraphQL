@@ -1,4 +1,5 @@
 import { ApolloServer, gql } from "apollo-server";
+import { PrismaClient } from "@prisma/client";
 
 const typeDefs = gql`
   type User {
@@ -31,6 +32,8 @@ const typeDefs = gql`
 `;
 
 const resolvers = [];
+
+const prisma = new PrismaClient();
 
 const server = new ApolloServer({ typeDefs, resolvers });
 server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
