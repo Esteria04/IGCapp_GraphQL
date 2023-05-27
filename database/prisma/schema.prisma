@@ -12,36 +12,30 @@ model User {
     name     String
     nickname String
     school   String
-    profile  Profile?
     article  Article[]
     comment  Comment[]
 }
 
-model Profile {
-    id     Int
-    userId Int  @unique
-    User   User @relation(fields: [userId], references: [id])
-}
-
 model Comment {
-    id            Int      @id @default(autoincrement())
-    authorId      Int      @unique
-    author        User     @relation(fields: [authorId], references: [id])
-    articleId     Int      @unique
-    article       Article  @relation(fields: [articleId], references: [id])
+    id            Int       @id @default(autoincrement())
+    authorId      Int       @unique
+    author        User      @relation(fields: [authorId], references: [id])
+    articleId     Int       @unique
+    article       Article   @relation(fields: [articleId], references: [id])
     type          Boolean
     publishedDate DateTime
-    modifiedDate  DateTime
+    modifiedDate  DateTime?
     content       String
 }
 
 model Article {
-    id            Int      @id @default(autoincrement())
-    authorId      Int      @unique
-    author        User     @relation(fields: [authorId], references: [id])
+    id            Int       @id @default(autoincrement())
+    authorId      Int       @unique
+    author        User      @relation(fields: [authorId], references: [id])
     type          Boolean
+    title         String
     publishedDate DateTime
-    modifiedDate  DateTime
+    modifiedDate  DateTime?
     content       String
     comment       Comment[]
 }
