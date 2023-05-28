@@ -81,13 +81,19 @@ const prisma = new PrismaClient();
 
 const resolvers = {
   Query: {
+    async user(_, { id }) {
+      const user = await prisma.user.findUnique({ where: { id: id } });
+      return user;
+    },
     async users() {
       const users = await prisma.user.findMany({});
       return users;
     },
-    async user(_, { id }) {
-      const user = await prisma.user.findUnique({ where: { id: id } });
-      return user;
+    async article(_, { articleId }) {
+      const article = await prisma.article.findUnique({
+        where: { id: articleId },
+      });
+      return article;
     },
     async articles(_, { userId }) {
       const articles = await prisma.article.findMany({
@@ -95,11 +101,23 @@ const resolvers = {
       });
       return articles;
     },
-    async article(_, { articleId }) {
-      const article = await prisma.article.findUnique({
-        where: { id: articleId },
+    async comment(_, { commentId }) {
+      const comment = await prisma.comment.findUnique({
+        where: { id: commentId },
       });
-      return article;
+      return comment;
+    },
+    async commentsFromUser(_, { userId }) {
+      const comments = await prisma.comment.findMany({
+        where: { authorId: userId },
+      });
+      return comments;
+    },
+    async commentsFromArticle(_, { articleId }) {
+      const comments = await prisma.comment.findMany({
+        where: { articleId },
+      });
+      return comments;
     },
   },
   Mutation: {
