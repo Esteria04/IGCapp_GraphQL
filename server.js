@@ -139,25 +139,27 @@ const resolvers = {
       }
     },
 
-    async postArticle(_, { name, nickname, school }) {
+    async postArticle(_, { authorId, type, title, content }) {
       const article = await prisma.article.create({
         data: {
-          name,
-          nickname,
-          school,
+          authorId,
+          type,
+          title,
+          content,
         },
       });
       return article;
     },
-    async modifyArticle(_, { articleId, name, nickname, school }) {
+    async modifyArticle(_, { articleId, authorId, type, title, content }) {
       const article = await prisma.article.update({
         where: {
           id: parseInt(articleId),
         },
         data: {
-          name,
-          nickname,
-          school,
+          authorId,
+          type,
+          title,
+          content,
         },
       });
       return article;
@@ -170,6 +172,44 @@ const resolvers = {
           },
         });
         return article !== null;
+      } catch {
+        return false;
+      }
+    },
+
+    async postComment(_, { authorId, type, title, content }) {
+      const comment = await prisma.comment.create({
+        data: {
+          authorId,
+          type,
+          title,
+          content,
+        },
+      });
+      return comment;
+    },
+    async modifyComment(_, { commentId, authorId, type, title, content }) {
+      const comment = await prisma.comment.update({
+        where: {
+          id: parseInt(commentId),
+        },
+        data: {
+          authorId,
+          type,
+          title,
+          content,
+        },
+      });
+      return comment;
+    },
+    async deleteComment(_, { commentId }) {
+      try {
+        const comment = await prisma.comment.delete({
+          where: {
+            id: parseInt(commentId),
+          },
+        });
+        return comment !== null;
       } catch {
         return false;
       }
