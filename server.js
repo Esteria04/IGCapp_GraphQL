@@ -57,7 +57,12 @@ const typeDefs = gql`
     ): Article!
     deleteArticle(authorId: ID!, articleId: ID!): Boolean!
 
-    postComment(authorId: ID!, type: Boolean!, content: String!): Comment!
+    postComment(
+      authorId: ID!
+      articleId: ID!
+      type: Boolean!
+      content: String!
+    ): Comment!
     modifyComment(
       authorId: ID!
       type: Boolean
@@ -182,11 +187,12 @@ const resolvers = {
       });
       return article;
     },
-    async deleteArticle(_, { articleId }) {
+    async deleteArticle(_, { articleId, authorId }) {
       try {
         const article = await prisma.article.delete({
           where: {
             id: parseInt(articleId),
+            authorId: parseInt(authorId),
           },
         });
         return article !== null;
@@ -195,10 +201,11 @@ const resolvers = {
       }
     },
 
-    async postComment(_, { authorId, type, title, content }) {
+    async postComment(_, { authorId, articleId, type, title, content }) {
       const comment = await prisma.comment.create({
         data: {
           authorId,
+          articleId,
           type,
           title,
           content,
@@ -210,9 +217,9 @@ const resolvers = {
       const comment = await prisma.comment.update({
         where: {
           id: parseInt(commentId),
+          authorId: parseInt(authorId),
         },
         data: {
-          authorId,
           type,
           title,
           content,
@@ -220,11 +227,12 @@ const resolvers = {
       });
       return comment;
     },
-    async deleteComment(_, { commentId }) {
+    async deleteComment(_, { commentId, authorId }) {
       try {
         const comment = await prisma.comment.delete({
           where: {
             id: parseInt(commentId),
+            authorId: parseInt(authorId),
           },
         });
         return comment !== null;
