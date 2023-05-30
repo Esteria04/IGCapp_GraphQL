@@ -8,25 +8,20 @@ generator client {
 }
 
 model User {
-    id       Int       @id @default(autoincrement())
+    id       Int    @id @default(autoincrement())
     name     String
     nickname String
     school   String
-    article  Article[]
-    comment  Comment[]
 }
 
 model Comment {
     id            Int       @id @default(autoincrement())
     authorId      Int
-    author        User      @relation(fields: [authorId], references: [id])
     articleId     Int
-    article       Article   @relation(fields: [articleId], references: [id])
     boardId       Int
-    board         Board     @relation(fields: [boardId], references: [id])
     type          Boolean
-    publishedDate DateTime
-    modifiedDate  DateTime?
+    publishedDate DateTime  @default(now())
+    modifiedDate  DateTime? @updatedAt
     content       String
 }
 
@@ -34,19 +29,14 @@ model Article {
     id            Int       @id @default(autoincrement())
     authorId      Int
     boardId       Int
-    author        User      @relation(fields: [authorId], references: [id])
-    board         Board     @relation(fields: [boardId], references: [id])
     type          Boolean
     title         String
-    publishedDate DateTime
-    modifiedDate  DateTime?
+    publishedDate DateTime  @default(now())
+    modifiedDate  DateTime? @updatedAt
     content       String
-    comment       Comment[]
 }
 
 model Board {
-    id      Int       @id @default(autoincrement())
-    name    String    @unique
-    article Article[]
-    Comment Comment[]
+    id   Int    @id @default(autoincrement())
+    name String @unique
 }

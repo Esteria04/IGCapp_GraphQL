@@ -39,12 +39,18 @@ const typeDefs = gql`
   }
 
   type Query {
+    user(id: ID!): User
     users: [User!]!
-    articles(userId: ID): [Article!]!
-    comments: [Comment!]!
-    user(id: ID): User
-    article(id: ID): Article
+    board(id: ID!): Board!
+    boards: [Board!]!
+    article(id: ID!): Article!
+    articles: [Article!]!
+    articlesFromUser(userId: ID!): [Article!]!
+    articlesFromBoard(boardId: ID!): [Article!]!
     comment(id: ID): Comment
+    comments: [Comment!]!
+    commentsFromUser(userId: ID!): [Comment!]!
+    commentsFromArticle: [Comment!]!
   }
 
   type Mutation {
@@ -161,7 +167,8 @@ const resolvers = {
           },
         });
         return user !== null;
-      } catch {
+      } catch (e) {
+        console.log(e);
         return false;
       }
     },
@@ -186,7 +193,8 @@ const resolvers = {
           },
         });
         return user !== null;
-      } catch {
+      } catch (e) {
+        console.log(e);
         return false;
       }
     },
@@ -207,22 +215,28 @@ const resolvers = {
           where: { id: boardId },
         });
         return board !== null;
-      } catch {
+      } catch (e) {
+        console.log(e);
         return false;
       }
     },
 
     async postArticle(_, { authorId, boardId, type, title, content }) {
-      const article = await prisma.article.create({
-        data: {
-          authorId,
-          boardId,
-          type,
-          title,
-          content,
-        },
-      });
-      return article;
+      try {
+        const article = await prisma.article.create({
+          data: {
+            authorId: parseInt(authorId),
+            boardId: parseInt(boardId),
+            type,
+            title,
+            content,
+          },
+        });
+        return article !== null;
+      } catch (e) {
+        console.log(e);
+        return false;
+      }
     },
     async modifyArticle(
       _,
@@ -233,8 +247,8 @@ const resolvers = {
           id: parseInt(articleId),
         },
         data: {
-          authorId,
-          boardId,
+          authorId: parseInt(authorId),
+          boardId: parseInt(boardId),
           type,
           title,
           content,
@@ -251,22 +265,28 @@ const resolvers = {
           },
         });
         return article !== null;
-      } catch {
+      } catch (e) {
+        console.log(e);
         return false;
       }
     },
 
     async postComment(_, { authorId, articleId, type, title, content }) {
-      const comment = await prisma.comment.create({
-        data: {
-          authorId,
-          articleId,
-          type,
-          title,
-          content,
-        },
-      });
-      return comment;
+      try {
+        const comment = await prisma.comment.create({
+          data: {
+            authorId: parseInt(authorId),
+            articleId: parseInt(articleId),
+            type,
+            title,
+            content,
+          },
+        });
+        return comment !== null;
+      } catch (e) {
+        console.log(e);
+        return false;
+      }
     },
     async modifyComment(_, { commentId, authorId, type, title, content }) {
       const comment = await prisma.comment.update({
@@ -291,7 +311,8 @@ const resolvers = {
           },
         });
         return comment !== null;
-      } catch {
+      } catch (e) {
+        console.log(e);
         return false;
       }
     },
