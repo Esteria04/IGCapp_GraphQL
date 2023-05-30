@@ -9,10 +9,11 @@ const typeDefs = gql`
     school: String!
     articles: [Article]!
     comments: [Comment]!
-  }kk
+  }
   type Article {
     id: ID!
     author: User!
+    board: Board!
     type: Boolean!
     publishDate: String!
     modifyDate: String
@@ -20,15 +21,21 @@ const typeDefs = gql`
     content: String!
     comments: [Comment]!
   }
-
   type Comment {
     id: ID!
     author: User!
+    board: Board!
     type: Boolean!
     publishDate: String!
     modifyDate: String
     article: Article!
     content: String!
+  }
+  type Board {
+    id: ID!
+    name: String!
+    articles: [Article]!
+    comments: [Comment]!
   }
 
   type Query {
@@ -41,14 +48,18 @@ const typeDefs = gql`
   }
 
   type Mutation {
+    createBoard(name: String!): Boolean!
+    deleteBoard(boardId: String!): Boolean!
     postArticle(
       authorId: ID!
+      boardId: ID!
       type: Boolean!
       title: String!
       content: String!
-    ): Article!
+    ): Boolean!
     modifyArticle(
       authorId: ID!
+      boardId: ID!
       type: Boolean
       title: String
       content: String
@@ -58,19 +69,21 @@ const typeDefs = gql`
 
     postComment(
       authorId: ID!
+      boardId: ID!
       articleId: ID!
       type: Boolean!
       content: String!
     ): Comment!
     modifyComment(
       authorId: ID!
+      boardId: ID!
       type: Boolean
       content: String
       commentId: ID!
     ): Comment!
     deleteComment(authorId: ID!, commentId: ID!): Boolean!
 
-    createUser(name: String!, nickname: String!, school: String!): User!
+    createUser(name: String!, nickname: String!, school: String!): Boolean!
     modifyUser(
       userId: ID!
       name: String
@@ -93,16 +106,28 @@ const resolvers = {
       const users = await prisma.user.findMany({});
       return users;
     },
+    async board(_, { boardId }) {
+      const board = await prisma.board.findUnique({ where: { id: boardId } });
+      return board;
+    },
+    async boards() {
+      const boards = await prisma.board.findMany({});
+      return boards;
+    },
     async article(_, { articleId }) {
       const article = await prisma.article.findUnique({
         where: { id: articleId },
       });
       return article;
     },
-    async articles(_, { userId }) {
+    async articlesFromUser(_, { userId }) {
       const articles = await prisma.article.findMany({
         where: { authorId: userId },
       });
+      return articles;
+    },
+    async articlesFromBoard(_, { boardId }) {
+      const articles = await prisma.article.findMany({ where: { boardId } });
       return articles;
     },
     async comment(_, { commentId }) {
@@ -124,16 +149,21 @@ const resolvers = {
       return comments;
     },
   },
+
   Mutation: {
     async createUser(_, { name, nickname, school }) {
-      const user = await prisma.user.create({
-        data: {
-          name,
-          nickname,
-          school,
-        },
-      });
-      return user;
+      try {
+        const user = await prisma.user.create({
+          data: {
+            name,
+            nickname,
+            school,
+          },
+        });
+        return user !== null;
+      } catch {
+        return false;
+      }
     },
     async modifyUser(_, { userId, name, nickname, school }) {
       const user = await prisma.user.update({
@@ -161,10 +191,32 @@ const resolvers = {
       }
     },
 
-    async postArticle(_, { authorId, type, title, content }) {
+    async createBoard(_, { name }) {
+      try {
+        const board = await prisma.board.create({
+          data: { name },
+        });
+        return board !== null;
+      } catch {
+        return false;
+      }
+    },
+    async deleteBoard(_, { boardId }) {
+      try {
+        const board = await prisma.board.delete({
+          where: { id: boardId },
+        });
+        return board !== null;
+      } catch {
+        return false;
+      }
+    },
+
+    async postArticle(_, { authorId, boardId, type, title, content }) {
       const article = await prisma.article.create({
         data: {
           authorId,
+          boardId,
           type,
           title,
           content,
@@ -172,13 +224,17 @@ const resolvers = {
       });
       return article;
     },
-    async modifyArticle(_, { articleId, authorId, type, title, content }) {
+    async modifyArticle(
+      _,
+      { articleId, authorId, boardId, type, title, content }
+    ) {
       const article = await prisma.article.update({
         where: {
           id: parseInt(articleId),
         },
         data: {
           authorId,
+          boardId,
           type,
           title,
           content,
