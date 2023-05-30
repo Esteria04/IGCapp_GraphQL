@@ -9,8 +9,7 @@ const typeDefs = gql`
     school: String!
     articles: [Article]!
     comments: [Comment]!
-  }
-
+  }kk
   type Article {
     id: ID!
     author: User!
